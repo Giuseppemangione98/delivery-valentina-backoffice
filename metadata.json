@@ -1,0 +1,7 @@
+{
+  "name": "Giuseppe's Dashboard - Valentina's Delivery",
+  "description": "Backoffice application for managing gift and favor deliveries with real-time tracking, statistics, and a romantic dark theme.",
+  "requestFramePermissions": [
+    "geolocation"
+  ]
+}
