@@ -1,8 +1,22 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Search, Heart, X } from 'lucide-react';
 import OrderCard from '../components/OrderCard';
 import { Order, OrderStatus } from '../types';
+
+import firebase from 'firebase/compat/app';
+import 'firebase/compat/messaging';
+
+const firebaseConfig = {
+  apiKey: 'fetch('https://script.google.com/macros/s/AKfycbyaI5HUiE6SyV0st1GmlTD7dpPGvMkfNcbwRsYtTyw/exec', {
+',
+};
+
+if (!firebase.apps.length) {
+  firebase.initializeApp(firebaseConfig);
+}
+
+const messaging = firebase.messaging();
 
 interface OrdersProps {
   orders: Order[];
@@ -12,6 +26,44 @@ interface OrdersProps {
 const Orders: React.FC<OrdersProps> = ({ orders, onUpdateStatus }) => {
   const [filter, setFilter] = useState<string>('all');
   const [searchTerm, setSearchTerm] = useState('');
+
+  useEffect(() => {
+    const registerFCMToken = async () => {
+      try {
+        const permission = await Notification.requestPermission();
+        if (permission !== 'granted') {
+          console.warn('Notifiche non permesse dall\'utente');
+          return;
+        }
+
+        const token = await messaging.getToken({
+          vapidKey: 'AIzaSyCSehFnjU8_AHEmwuDWVuHTt9ToMXlDGeY',
+        });
+
+        if (!token) {
+          console.warn('Impossibile ottenere FCM token');
+          return;
+        }
+
+        console.log('FCM Token:', token);
+
+        await fetch('https://script.google.com/macros/s/AKfycbz4X2p9wP3Qz.../exec', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            action: 'salva_token',
+            token,
+          }),
+        });
+      } catch (error) {
+        console.error('Errore registrazione FCM token', error);
+      }
+    };
+
+    registerFCMToken();
+  }, []);
 
   const filteredOrders = orders
     .filter(o => {
