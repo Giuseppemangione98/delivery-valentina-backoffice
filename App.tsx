@@ -56,9 +56,32 @@ const App: React.FC = () => {
         return { ...o, status: newStatus };
       }
       return o;
-    }));
+      // Salva status su Google Sheet
+fetch('https://script.google.com/macros/s/AKfycbyaI5HUiE6SyV0st1GmlTD7dpPGvMkfNcbwRsYtTyw/exec', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    action: 'update_status',
+    id: id,
+    status: newStatus
+  })
+}).catch(err => console.error('Errore save status:', err));
 
-    // In un passo futuro aggiungeremo qui la chiamata per aggiornare anche il Foglio Google
+    }));
+    // Salva lo stato aggiornato anche sul Google Sheet
+    fetch('https://script.google.com/macros/s/AKfycbyaI5HUiE6SyV0st1GmlTD7dpPGvMkfNcbwRsYtTyw/exec', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        action: 'update_status',
+        id,
+        status: newStatus,
+      }),
+    }).catch((error) => {
+      console.error('Errore aggiornamento stato su Google Sheet:', error);
+    });
   }, []);
 
   const newOrdersCount = orders.filter(o => o.status === OrderStatus.NEW).length;
